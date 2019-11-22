@@ -6,4 +6,4 @@
  
  ### Code of Conduct
  
- This project is released with a [Code of Conduct](). Compliance to the code is required for participation in the project.
+ This project is released with a [Code of Conduct](https://github.com/UBC-MDS/DSCI-532-Group108/blob/master/CODE_OF_CONDUCT.md). Compliance to the code is required for participation in the project.
