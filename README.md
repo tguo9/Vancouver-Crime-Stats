@@ -1,7 +1,5 @@
 # DSCI-532-Group108
 
-Frank
-Tao
-Derek
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-LETS DO THIS
+Team members: Frank Lu, Derek Kruszewski, Tao Guo
