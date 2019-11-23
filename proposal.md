@@ -27,3 +27,7 @@ This APP can also serve as a visual assistance to policy makers and law enforcem
 1. Chief of the Vancouver Police Department
 
     The Chief of the Vancouver Police Department wants to manage the police portals more efficiently to let police portals get to the crime scene as soon as possible. The Chief wants to be able to choose different districts(neighborhoods) in a dataset to compare the crime type and locations in different periods and find the most effective way of arranging the police portals. When the Chief logs on to the "Vancouver Crime Buster App”, an overview of all neighborhoods with all kinds of crimes showed up. The Chief can filter out neighborhoods and different times. So when the Chief compares with the police portals schedule and locations, Chief can make adjust them accordingly. After the Chief did that, the Vancouver Police Department can go to the crime scene faster compared to the past. his app makes the Vancouver Police Department work more efficiently.
+
+2. Moving to Vancouver
+
+    Mariara is moving to Vancouver but she didn’t know which neighborhood is safe for her to live. She is right now in the process of house/apartment hunting, and she usually gets off work at 6 pm. When she logs on the “Vancouver Crime Buster App”, she can see when, where and kind of crime in different places. She can see all the neighborhoods and filters by different year, month and time. She can see the overall safety level in Vancouver.
