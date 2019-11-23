@@ -1,6 +1,7 @@
 # Proposal for Group 108
 
 ## Motivation and Purpose
+Feeling safe in a neighboorhood is important to quality of life. If we can understand where crime is occuring in a city and the seasonal trends of crime, we can make decisions about where to live and take proetctive measures on our property to minimize the risk of victimization. To assist citizens in this understanding, this data visualization app will allow the public to explore crime trends compared across vancouver neighboorhoods and see the crime trends within specific neighboorhoods of interest.
 
 ## Description of the Data
 The dataset that we choose to visualize is a public dataset that can be downloaded from the Vancouver Police Department's Open Data: https://geodash.vpd.ca/opendata/. It is a collection of types, locations, dates and times of crimes occurred in City of Vancouver for the past 16 years.  The earliest date in the dataset is January 1, 2003, and the latest date is October 31, 2019.  
