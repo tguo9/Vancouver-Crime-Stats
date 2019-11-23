@@ -18,6 +18,10 @@ There are 622,221 crime records in this dataset, and each crime record contains:
 - Which neighbourhood should a person from within Vancouver look for housing?
 - When and where the Vancouver Police Department should have more police portals?
 
+As many of our classmates come from outside Vancouver, it will be very helpful if we can create an APP that helps them choose a safe neighbourhood for their stay in Vancouver.  Depending on each person's life style (ie. jugging at night, driving a vehicle...etc), we also want to provide suggestions on a safer location and time for doing what they like.  The information above can be useful to local people, too, when it's time to make the big decision and purchase a property.
+  
+This APP can also serve as a visual assistance to policy makers and law enforcement.  If resources have been invested into reducing a certain crime types, they need to see whether the trend of that crime changes.  As the statistics of the crime data is aggregated neibourhood by neighbourhood, the trend in crime types is a good indicator for what should be included in the community development plans.
+
 ### Usage scenarios
 
 1. Chief of the Vancouver Police Department
