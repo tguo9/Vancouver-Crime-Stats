@@ -11,7 +11,7 @@ server = app.server
 app.title = 'Dash app with pure Altair HTML'
 
 df = pd.read_csv('data/crimedata_csv_all_years.csv')
-df = df.query('YEAR >= 2014').drop(columns = ['HUNDRED_BLOCK', 'X', 'Y'], inplace = False)
+df = df.query('YEAR >= 2014').drop(columns = ['HUNDRED_BLOCK', 'X', 'Y'])
 def plot_by_neighbor(df, col1, col2, xtitle, ytitle, color):
     df_new = (df.query('TYPE == \'{}\' | TYPE ==\'{}\''.format(col1, col2))
                 .groupby('NEIGHBOURHOOD')
@@ -19,7 +19,7 @@ def plot_by_neighbor(df, col1, col2, xtitle, ytitle, color):
                 .reset_index())
     cnt_max = df_new['TYPE'].max()
 
-    return alt.Chart(df_new).mark_bar().encode(
+    chart = alt.Chart(df_new).mark_bar().encode(
         alt.X('TYPE:Q', title = xtitle),
         alt.Y('NEIGHBOURHOOD:N', 
             sort = alt.EncodingSortField(
@@ -32,16 +32,18 @@ def plot_by_neighbor(df, col1, col2, xtitle, ytitle, color):
             alt.value('grey'))
     )
 
+    return chart
+
 app.layout = html.Div([
 
     html.H1('This is my first dashboard'),
     html.H2('This is a subtitle'),
-
+    html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png'),
     html.H3('Here is our first plot:'),
     html.Iframe(
         sandbox='allow-scripts',
         id='plot',
-        height='450',
+        height='600',
         width='625',
         style={'border-width': '0'},
 
