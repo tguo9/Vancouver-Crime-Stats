@@ -1,5 +1,9 @@
 import pandas as pd
 import altair as alt
+import geopandas as gpd
+import json
+from shapely.geometry import Point, Polygon
+import shapely.wkt
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -12,6 +16,7 @@ server = app.server
 app.title = 'Vancouver Crime Stats'
 
 df = pd.read_csv('../data/crimedata_csv_all_years.csv')
+df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 dict_of_locations = dict(zip(list_of_locations, list_of_locations))
@@ -46,6 +51,65 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
     title=crime
     )
     return chart
+
+geojson_filepath = '../data/our_geojson.geojson'
+
+def open_geojson(path):
+    """
+    Opens a geojson file at "path" filepath
+    """
+    with open(path) as json_data:
+        d = json.load(json_data)
+    return d
+
+def get_geopandas_df(path):
+    """
+    Creates geopandas dataframe from geeojson file 
+    at "path" filepath
+    """
+    open_json = open_geojson(path)
+    gdf = gpd.GeoDataFrame.from_features((open_json))
+    return gdf
+
+gdf = get_geopandas_df(geojson_filepath)
+gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
+
+def plot_choropleth(year_init, year_end, crime_type):
+
+    crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
+                 .count().rename(columns = {'MINUTE': 'COUNT'})
+                 .reset_index())
+
+    if(crime_type.lower() == 'all'):
+        crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
+    else:
+        crime_cnt = crime_cnt.query('TYPE == @crime_type').groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
+
+    crime_geo_cnt = gdf.merge(crime_cnt, on = 'NEIGHBOURHOOD')
+
+    alt_json = json.loads(crime_geo_cnt.to_json())
+    alt_base = alt.Data(values = alt_json['features'])
+
+    base_map = alt.Chart(alt_base, 
+                         title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
+            stroke='white',
+            strokeWidth=1
+        ).encode(
+        ).properties(
+            width=1000,
+            height=600
+        )
+
+
+    choro = alt.Chart(alt_base).mark_geoshape(
+        fill = 'lightgray', 
+        stroke = 'white'
+    ).encode(
+        color = 'properties.COUNT:Q'
+    )
+
+    return (choro + base_map).properties(width = 700, height = 400)
+
 
 app.layout = html.Div([
 
