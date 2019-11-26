@@ -12,6 +12,8 @@ server = app.server
 app.title = 'Dash app with pure Altair HTML'
 
 df = pd.read_csv('data/crimedata_csv_all_years.csv')
+list_of_locations = df['NEIGHBOURHOOD'].unique()
+dict_of_locations = dict(zip(list_of_locations, list_of_locations))
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
         if crime != "ALL":
@@ -61,11 +63,10 @@ app.layout = html.Div([
         dcc.Dropdown(
         id='dd-chart',
         options=[
-            {'label': 'Sunset', 'value': 'Sunset'},
-            {'label': 'Arbutus Ridge', 'value': 'Arbutus Ridge'},
-            {'label': 'Central Business District', 'value': 'Central Business District'}
+            {'label': i, 'value': i}
+            for i in dict_of_locations
         ],
-        value='Sunset',
+        value = 'Sunset',
         style=dict(width='45%',
             verticalAlign="middle"
             )
