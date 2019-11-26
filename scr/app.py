@@ -1,5 +1,9 @@
 import pandas as pd
 import altair as alt
+import geopandas as gpd
+import json
+from shapely.geometry import Point, Polygon
+import shapely.wkt
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -12,12 +16,15 @@ server = app.server
 app.title = 'Vancouver Crime Stats'
 
 df = pd.read_csv('../data/crimedata_csv_all_years.csv')
+df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 dict_of_locations = dict(zip(list_of_locations, list_of_locations))
 
 list_of_crimes = df['TYPE'].dropna().unique()
 dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
+
+list_of_years = ['YEAR', 'MONTH']
 
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
@@ -47,35 +54,76 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
     )
     return chart
 
+geojson_filepath = '../data/our_geojson.geojson'
+
+def open_geojson(path):
+    """
+    Opens a geojson file at "path" filepath
+    """
+    with open(path) as json_data:
+        d = json.load(json_data)
+    return d
+
+def get_geopandas_df(path):
+    """
+    Creates geopandas dataframe from geeojson file 
+    at "path" filepath
+    """
+    open_json = open_geojson(path)
+    gdf = gpd.GeoDataFrame.from_features((open_json))
+    return gdf
+
+gdf = get_geopandas_df(geojson_filepath)
+gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
+
+def plot_choropleth(year_init, year_end, crime_type):
+
+    crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
+                .count().rename(columns = {'MINUTE': 'COUNT'})
+                .reset_index())
+
+    if(crime_type.lower() == 'all'):
+        crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
+    else:
+        crime_cnt = crime_cnt.query('TYPE == @crime_type').groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
+
+    crime_geo_cnt = gdf.merge(crime_cnt, on = 'NEIGHBOURHOOD')
+
+    alt_json = json.loads(crime_geo_cnt.to_json())
+    alt_base = alt.Data(values = alt_json['features'])
+
+    base_map = alt.Chart(alt_base, 
+                        title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
+            stroke='white',
+            strokeWidth=1
+        ).encode(
+        ).properties(
+            width=1000,
+            height=600
+        )
+
+    choro = alt.Chart(alt_base).mark_geoshape(
+        fill = 'lightgray', 
+        stroke = 'white'
+    ).encode(
+        color = 'properties.COUNT:Q'
+    )
+
+    return (choro + base_map).properties(width = 700, height = 400)
+
+
 app.layout = html.Div([
 
-    html.H1('Vancouver Crime Stats'),
-    html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png'),
-    html.H2('Here is our first plot:'),
-    html.Iframe(
-        sandbox='allow-scripts',
-        id='plot',
-        height='600',
-        width='625',
-        style={'border-width': '0'},
+    html.Div([
+        #Header
+        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left'}),
+        html.H1('Vancouver Crime Stats', style={'float':'left', 'margin-left':'10px'}),
+    ],style={'position':'absolute'}),
+    
+    html.Div([
+        # Drop Down Menus
 
-        ################ The magic happens here
-        srcDoc=plot_by_neighbor().to_html()
-        ################ The magic happens here
-        ),
-
-        dcc.Dropdown(
-        id='dd-chart',
-        options=[
-            {'label': i, 'value': i}
-            for i in list_of_locations
-        ],
-        value = 'ALL',
-        style=dict(width='45%',
-            verticalAlign="middle"
-            )
-        ),
-
+        html.H3('Crime Type'),
         dcc.Dropdown(
         id='crime-chart',
         options=[
@@ -83,18 +131,87 @@ app.layout = html.Div([
             for i in list_of_crimes
         ],
         value = 'Theft of Bicycle',
-        style=dict(width='45%',
+        style=dict(width='90%',
             verticalAlign="middle"
             )
         ),
-])
+
+        html.H3('Years to Include'),
+        html.Div([
+            dcc.RangeSlider(
+                id='year-slider',
+                min=df['YEAR'].min(),
+                max=df['YEAR'].max(),
+                step=1,
+                marks={i:'{}'.format(i) for i in range(df['YEAR'].min(),df['YEAR'].max(),2)},
+                value=[df['YEAR'].min(), df['YEAR'].max()]
+            ),
+        ], style={'width': '90%', 'margin-left':'20px'}),
+        html.Br(),
+
+        html.H3('Neighbourhood'),
+        dcc.Dropdown(
+        id='dd-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in list_of_locations
+        ],
+        value = 'ALL',
+        style=dict(width='90%',
+            verticalAlign="middle"
+            )
+        ),
+
+        html.H3('Time Scale'),
+        dcc.Dropdown(
+        id='year-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in list_of_years
+        ],
+        value = 'YEAR',
+        style=dict(width='90%',
+            verticalAlign="middle"
+            )
+        ),
+
+
+    ], style={'float': 'left', 'width': '30%', 'height':'800px', 'margin-top': '100px', 'background-color':'#f7bb86'}),
+    
+    html.Div([
+        # Graphs
+        
+        html.Iframe(
+            # Crime Map
+            sandbox='allow-scripts',
+            height='400',
+            width='100%',
+            style={'border-width': '0'},
+            
+            ### INSERT MAP CODE HERE FRANK, Don't forget ID for IFrame
+
+            ),
+        
+        html.Iframe(
+            # Crime Trends
+            sandbox='allow-scripts',
+            id='plot',
+            height='400',
+            width='100%',
+            style={'border-width': '0'},
+
+            srcDoc=plot_by_neighbor().to_html()
+        
+            ),
+    ], style={'float': 'right', 'width': '70%', 'margin-top': '100px'}),        
+], style={})
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value')])
-def update_plot(location, types):
+    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
+def update_plot(location, types, year):
 
-    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types).to_html()
+    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, time_scale=year).to_html()
 
     return updated_plot
 
