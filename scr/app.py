@@ -24,8 +24,8 @@ dict_of_locations = dict(zip(list_of_locations, list_of_locations))
 list_of_crimes = df['TYPE'].dropna().unique()
 dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
 
-list_of_years = df['YEAR'].dropna().unique()
-dict_of_years = dict(zip(list_of_years, list_of_years))
+dict_of_years = {'Year': 'YEAR',
+                    'Month': 'MONTH'}
 
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
@@ -155,7 +155,7 @@ app.layout = html.Div([
         id='dd-chart',
         options=[
             {'label': i, 'value': i}
-            for i in list_of_locations
+            for i in dict_of_locations
         ],
         value = 'ALL',
         style=dict(width='90%',
@@ -164,12 +164,11 @@ app.layout = html.Div([
         ),
 
         html.H3('Time Scale'),
-        ### INSERT Time Scale Dropdown here Tao
         dcc.Dropdown(
         id='year-chart',
         options=[
             {'label': i, 'value': i}
-            for i in list_of_years
+            for i in dict_of_years
         ],
         value = 'YEAR',
         style=dict(width='90%',
@@ -211,9 +210,9 @@ app.layout = html.Div([
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
     [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
-def update_plot(location, types, years):
+def update_plot(location, types, year):
 
-    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, year=years).to_html()
+    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, time_scale=year).to_html()
 
     return updated_plot
 
