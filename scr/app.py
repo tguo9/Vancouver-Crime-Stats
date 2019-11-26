@@ -24,6 +24,9 @@ dict_of_locations = dict(zip(list_of_locations, list_of_locations))
 list_of_crimes = df['TYPE'].dropna().unique()
 dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
 
+list_of_years = df['YEAR'].dropna().unique()
+dict_of_years = dict(zip(list_of_years, list_of_years))
+
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
         if crime != "ALL":
@@ -77,8 +80,8 @@ gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'descriptio
 def plot_choropleth(year_init, year_end, crime_type):
 
     crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
-                 .count().rename(columns = {'MINUTE': 'COUNT'})
-                 .reset_index())
+                .count().rename(columns = {'MINUTE': 'COUNT'})
+                .reset_index())
 
     if(crime_type.lower() == 'all'):
         crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
@@ -91,7 +94,7 @@ def plot_choropleth(year_init, year_end, crime_type):
     alt_base = alt.Data(values = alt_json['features'])
 
     base_map = alt.Chart(alt_base, 
-                         title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
+                        title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
             stroke='white',
             strokeWidth=1
         ).encode(
@@ -99,7 +102,6 @@ def plot_choropleth(year_init, year_end, crime_type):
             width=1000,
             height=600
         )
-
 
     choro = alt.Chart(alt_base).mark_geoshape(
         fill = 'lightgray', 
@@ -163,6 +165,18 @@ app.layout = html.Div([
 
         html.H3('Time Scale'),
         ### INSERT Time Scale Dropdown here Tao
+        dcc.Dropdown(
+        id='year-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in list_of_years
+        ],
+        value = 'YEAR',
+        style=dict(width='90%',
+            verticalAlign="middle"
+            )
+        ),
+
 
     ], style={'float': 'left', 'width': '30%', 'height':'800px', 'margin-top': '100px', 'background-color':'#f7bb86'}),
     
@@ -196,10 +210,10 @@ app.layout = html.Div([
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value')])
-def update_plot(location, types):
+    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
+def update_plot(location, types, years):
 
-    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types).to_html()
+    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, year=years).to_html()
 
     return updated_plot
 
