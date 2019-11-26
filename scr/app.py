@@ -113,33 +113,16 @@ def plot_choropleth(year_init, year_end, crime_type):
 
 app.layout = html.Div([
 
-    html.H1('Vancouver Crime Stats'),
-    html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png'),
-    html.H2('Here is our first plot:'),
-    html.Iframe(
-        sandbox='allow-scripts',
-        id='plot',
-        height='600',
-        width='625',
-        style={'border-width': '0'},
+    html.Div([
+        #Header
+        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left'}),
+        html.H1('Vancouver Crime Stats', style={'float':'left', 'margin-left':'10px'}),
+    ],style={'position':'absolute'}),
+    
+    html.Div([
+        # Drop Down Menus
 
-        ################ The magic happens here
-        srcDoc=plot_by_neighbor().to_html()
-        ################ The magic happens here
-        ),
-
-        dcc.Dropdown(
-        id='dd-chart',
-        options=[
-            {'label': i, 'value': i}
-            for i in list_of_locations
-        ],
-        value = 'ALL',
-        style=dict(width='45%',
-            verticalAlign="middle"
-            )
-        ),
-
+        html.H3('Crime Type'),
         dcc.Dropdown(
         id='crime-chart',
         options=[
@@ -147,11 +130,69 @@ app.layout = html.Div([
             for i in list_of_crimes
         ],
         value = 'Theft of Bicycle',
-        style=dict(width='45%',
+        style=dict(width='90%',
             verticalAlign="middle"
             )
         ),
-])
+
+        html.H3('Years to Include'),
+        html.Div([
+            dcc.RangeSlider(
+                id='year-slider',
+                min=df['YEAR'].min(),
+                max=df['YEAR'].max(),
+                step=1,
+                marks={i:'{}'.format(i) for i in range(df['YEAR'].min(),df['YEAR'].max(),2)},
+                value=[df['YEAR'].min(), df['YEAR'].max()]
+            ),
+        ], style={'width': '90%', 'margin-left':'20px'}),
+        html.Br(),
+
+        html.H3('Neighbourhood'),
+        dcc.Dropdown(
+        id='dd-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in list_of_locations
+        ],
+        value = 'ALL',
+        style=dict(width='90%',
+            verticalAlign="middle"
+            )
+        ),
+
+        html.H3('Time Scale'),
+        ### INSERT Time Scale Dropdown here Tao
+
+    ], style={'float': 'left', 'width': '30%', 'height':'800px', 'margin-top': '100px', 'background-color':'#f7bb86'}),
+    
+    html.Div([
+        # Graphs
+        
+        html.Iframe(
+            # Crime Map
+            sandbox='allow-scripts',
+            height='400',
+            width='100%',
+            style={'border-width': '0'},
+            
+            ### INSERT MAP CODE HERE FRANK, Don't forget ID for IFrame
+
+            ),
+        
+        html.Iframe(
+            # Crime Trends
+            sandbox='allow-scripts',
+            id='plot',
+            height='400',
+            width='100%',
+            style={'border-width': '0'},
+
+            srcDoc=plot_by_neighbor().to_html()
+        
+            ),
+    ], style={'float': 'right', 'width': '70%', 'margin-top': '100px'}),        
+], style={})
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
