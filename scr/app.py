@@ -9,11 +9,16 @@ app = dash.Dash(__name__, assets_folder='assets')
 app.config['suppress_callback_exceptions'] = True
 server = app.server
 
-app.title = 'Dash app with pure Altair HTML'
+app.title = 'Vancouver Crime Stats'
 
-df = pd.read_csv('data/crimedata_csv_all_years.csv')
-list_of_locations = df['NEIGHBOURHOOD'].unique()
+df = pd.read_csv('../data/crimedata_csv_all_years.csv')
+
+list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 dict_of_locations = dict(zip(list_of_locations, list_of_locations))
+
+list_of_crimes = df['TYPE'].dropna().unique()
+dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
+
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
         if crime != "ALL":
@@ -44,10 +49,9 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
 
 app.layout = html.Div([
 
-    html.H1('This is my first dashboard'),
-    html.H2('This is a subtitle'),
+    html.H1('Vancouver Crime Stats'),
     html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png'),
-    html.H3('Here is our first plot:'),
+    html.H2('Here is our first plot:'),
     html.Iframe(
         sandbox='allow-scripts',
         id='plot',
@@ -64,9 +68,21 @@ app.layout = html.Div([
         id='dd-chart',
         options=[
             {'label': i, 'value': i}
-            for i in dict_of_locations
+            for i in list_of_locations
         ],
-        value = 'Sunset',
+        value = 'ALL',
+        style=dict(width='45%',
+            verticalAlign="middle"
+            )
+        ),
+
+        dcc.Dropdown(
+        id='crime-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in list_of_crimes
+        ],
+        value = 'Theft of Bicycle',
         style=dict(width='45%',
             verticalAlign="middle"
             )
@@ -75,10 +91,10 @@ app.layout = html.Div([
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('dd-chart', 'value')])
-def update_plot(xaxis_column_name):
+    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value')])
+def update_plot(location, types):
 
-    updated_plot = plot_by_neighbor(neighbourhood=xaxis_column_name).to_html()
+    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types).to_html()
 
     return updated_plot
 
