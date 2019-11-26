@@ -24,8 +24,7 @@ dict_of_locations = dict(zip(list_of_locations, list_of_locations))
 list_of_crimes = df['TYPE'].dropna().unique()
 dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
 
-dict_of_years = {'Year': 'YEAR',
-                    'Month': 'MONTH'}
+list_of_years = ['YEAR', 'MONTH']
 
 def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
     if neighbourhood != "ALL":
@@ -155,7 +154,7 @@ app.layout = html.Div([
         id='dd-chart',
         options=[
             {'label': i, 'value': i}
-            for i in dict_of_locations
+            for i in list_of_locations
         ],
         value = 'ALL',
         style=dict(width='90%',
@@ -168,7 +167,7 @@ app.layout = html.Div([
         id='year-chart',
         options=[
             {'label': i, 'value': i}
-            for i in dict_of_years
+            for i in list_of_years
         ],
         value = 'YEAR',
         style=dict(width='90%',
