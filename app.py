@@ -6,32 +6,40 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 app = dash.Dash(__name__, assets_folder='assets')
+app.config['suppress_callback_exceptions'] = True
 server = app.server
 
 app.title = 'Dash app with pure Altair HTML'
 
 df = pd.read_csv('data/crimedata_csv_all_years.csv')
-df = df.query('YEAR >= 2014').drop(columns = ['HUNDRED_BLOCK', 'X', 'Y'])
-def plot_by_neighbor(df, col1, col2, xtitle, ytitle, color):
-    df_new = (df.query('TYPE == \'{}\' | TYPE ==\'{}\''.format(col1, col2))
-                .groupby('NEIGHBOURHOOD')
-                .count()
-                .reset_index())
-    cnt_max = df_new['TYPE'].max()
-
-    chart = alt.Chart(df_new).mark_bar().encode(
-        alt.X('TYPE:Q', title = xtitle),
-        alt.Y('NEIGHBOURHOOD:N', 
-            sort = alt.EncodingSortField(
-                field = 'TYPE', 
-                order = 'descending'), 
-            title = ytitle), 
-        color = alt.condition(
-            alt.datum.TYPE == cnt_max, 
-            alt.value(color), 
-            alt.value('grey'))
+list_of_locations = df['NEIGHBOURHOOD'].unique()
+dict_of_locations = dict(zip(list_of_locations, list_of_locations))
+def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
+    if neighbourhood != "ALL":
+        if crime != "ALL":
+            df_line = df.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
+        else:    
+            df_line = df.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
+    else:
+        if crime != "ALL":
+            df_line = df.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
+        else:
+            df_line = df.groupby([time_scale]).count().reset_index() 
+    
+    chart = alt.Chart(df_line).mark_line().encode(
+        alt.X(time_scale+':N'),
+        alt.Y('TYPE:Q', title='Number of Crimes'),
+        alt.Color(value="blue")
+    ).configure_axisX(
+        labelAngle=90,
+        grid=True
+    ).configure(
+        background='#f7e0bc' #HEX color code
+    ).properties(
+    height=300,
+    width=500,
+    title=crime
     )
-
     return chart
 
 app.layout = html.Div([
@@ -48,10 +56,31 @@ app.layout = html.Div([
         style={'border-width': '0'},
 
         ################ The magic happens here
-        srcDoc=plot_by_neighbor(df, 'Theft of Vehicle', 'Theft from Vehicle', 'Count of vehicle related crimes', 'Neighbourhood', 'orange').to_html()
+        srcDoc=plot_by_neighbor().to_html()
         ################ The magic happens here
         ),
+
+        dcc.Dropdown(
+        id='dd-chart',
+        options=[
+            {'label': i, 'value': i}
+            for i in dict_of_locations
+        ],
+        value = 'Sunset',
+        style=dict(width='45%',
+            verticalAlign="middle"
+            )
+        ),
 ])
+
+@app.callback(
+    dash.dependencies.Output('plot', 'srcDoc'),
+    [dash.dependencies.Input('dd-chart', 'value')])
+def update_plot(xaxis_column_name):
+
+    updated_plot = plot_by_neighbor(neighbourhood=xaxis_column_name).to_html()
+
+    return updated_plot
 
 if __name__ == '__main__':
     app.run_server(debug=True)
