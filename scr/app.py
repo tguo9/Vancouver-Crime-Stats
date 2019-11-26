@@ -9,9 +9,9 @@ app = dash.Dash(__name__, assets_folder='assets')
 app.config['suppress_callback_exceptions'] = True
 server = app.server
 
-app.title = 'Dash app with pure Altair HTML'
+app.title = 'Vancouver Crime Stats'
 
-df = pd.read_csv('data/crimedata_csv_all_years.csv')
+df = pd.read_csv('../data/crimedata_csv_all_years.csv')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 dict_of_locations = dict(zip(list_of_locations, list_of_locations))
@@ -49,10 +49,9 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
 
 app.layout = html.Div([
 
-    html.H1('This is my first dashboard'),
-    html.H2('This is a subtitle'),
+    html.H1('Vancouver Crime Stats'),
     html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png'),
-    html.H3('Here is our first plot:'),
+    html.H2('Here is our first plot:'),
     html.Iframe(
         sandbox='allow-scripts',
         id='plot',
