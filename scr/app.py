@@ -76,7 +76,7 @@ def get_geopandas_df(path):
 gdf = get_geopandas_df(geojson_filepath)
 gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
 
-def plot_choropleth(year_init, year_end, crime_type):
+def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
 
     crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
                 .count().rename(columns = {'MINUTE': 'COUNT'})
@@ -106,7 +106,7 @@ def plot_choropleth(year_init, year_end, crime_type):
         fill = 'lightgray', 
         stroke = 'white'
     ).encode(
-        color = 'properties.COUNT:Q'
+        color = alt.Color('properties.COUNT:Q', legend = alt.Legend(title = 'crime count'))
     )
 
     return (choro + base_map).properties(width = 700, height = 400)
@@ -184,12 +184,13 @@ app.layout = html.Div([
         html.Iframe(
             # Crime Map
             sandbox='allow-scripts',
+            id = 'choropleth',
             height='400',
             width='100%',
             style={'border-width': '0'},
             
             ### INSERT MAP CODE HERE FRANK, Don't forget ID for IFrame
-
+                srcDoc=plot_choropleth().to_html()
             ),
         
         html.Iframe(
@@ -212,6 +213,15 @@ app.layout = html.Div([
 def update_plot(location, types, year):
 
     updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, time_scale=year).to_html()
+
+    return updated_plot
+
+@app.callback(
+    dash.dependencies.Output('choropleth', 'srcDoc'),
+    [dash.dependencies.Input('year-slider', 'value'), dash.dependencies.Input('crime-chart', 'value')])
+def update_choropleth(year_range, type):
+
+    updated_plot = plot_choropleth(year_init=year_range[0], year_end=year_range[1], crime_type=type).to_html()
 
     return updated_plot
 
