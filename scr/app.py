@@ -20,6 +20,7 @@ df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NE
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_crimes = df['TYPE'].unique()
+list_of_crimes.insert(0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
 
 def plot_by_neighbor(neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
