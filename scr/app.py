@@ -26,17 +26,20 @@ dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
 
 list_of_years = ['YEAR', 'MONTH']
 
-def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
+def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
+    
+    df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
+    
     if neighbourhood != "ALL":
         if crime != "ALL":
-            df_line = df.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
+            df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
         else:    
-            df_line = df.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
+            df_line = df._line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
     else:
         if crime != "ALL":
-            df_line = df.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
+            df_line = df_line.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
         else:
-            df_line = df.groupby([time_scale]).count().reset_index() 
+            df_line = df_line.groupby([time_scale]).count().reset_index() 
     
     chart = alt.Chart(df_line).mark_line().encode(
         alt.X(time_scale+':N'),
@@ -50,7 +53,7 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
     ).properties(
     height=300,
     width=500,
-    title=crime
+    title= neighbourhood + ': ' + crime
     )
     return chart
 
@@ -93,7 +96,7 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
     alt_base = alt.Data(values = alt_json['features'])
 
     base_map = alt.Chart(alt_base, 
-                        title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
+                        title = f"Vancouver: {crime_type}").mark_geoshape(
             stroke='white',
             strokeWidth=1
         ).encode(
@@ -108,7 +111,7 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
         fill = 'lightgray', 
         stroke = 'white'
     ).encode(
-        color = alt.Color('properties.COUNT:Q', legend = alt.Legend(title = 'crime count'))
+        color = alt.Color('properties.COUNT:Q', legend = alt.Legend(title = 'Crime Count'))
     )
 
     return (choro + base_map).properties(width = 700, height = 400)
@@ -211,10 +214,10 @@ app.layout = html.Div([
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
-def update_plot(location, types, year):
+    [dash.dependencies.Input('year-slider', 'value'), dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
+def update_plot(year_range, location, types, year):
 
-    updated_plot = plot_by_neighbor(neighbourhood=location, crime=types, time_scale=year).to_html()
+    updated_plot = plot_by_neighbor(year_init=year_range[0], year_end=year_range[1], neighbourhood=location, crime=types, time_scale=year).to_html()
 
     return updated_plot
 
