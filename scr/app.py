@@ -8,6 +8,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import numpy as np
 
 app = dash.Dash(__name__, assets_folder='assets')
 app.config['suppress_callback_exceptions'] = True
@@ -19,7 +20,9 @@ df = pd.read_csv('../data/crimedata_csv_all_years.csv')
 df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
+list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
+list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
@@ -32,9 +35,11 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         else:    
             df_line = df._line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
     else:
+        neighbourhood = 'All Neighbourhoods'
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
         else:
+            crime = 'All Crimes'
             df_line = df_line.groupby([time_scale]).count().reset_index() 
     
     chart = alt.Chart(df_line).mark_line().encode(
@@ -82,6 +87,7 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
                 .reset_index())
 
     if(crime_type.lower() == 'all'):
+        crime_type = 'All Crimes'
         crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
     else:
         crime_cnt = crime_cnt.query('TYPE == @crime_type').groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
