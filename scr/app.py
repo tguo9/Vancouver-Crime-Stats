@@ -20,6 +20,7 @@ df = pd.read_csv('../data/crimedata_csv_all_years.csv')
 df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
+list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
