@@ -35,6 +35,7 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         else:    
             df_line = df._line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
     else:
+        neighbourhood = 'All Neighbourhoods'
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
         else:
