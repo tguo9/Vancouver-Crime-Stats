@@ -86,6 +86,7 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
                 .reset_index())
 
     if(crime_type.lower() == 'all'):
+        crime_type = 'All Crimes'
         crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
     else:
         crime_cnt = crime_cnt.query('TYPE == @crime_type').groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
