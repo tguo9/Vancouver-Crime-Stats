@@ -8,6 +8,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import numpy as np
 
 app = dash.Dash(__name__, assets_folder='assets')
 app.config['suppress_callback_exceptions'] = True
@@ -20,7 +21,7 @@ df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NE
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_crimes = df['TYPE'].unique()
-list_of_crimes.insert(0, 'ALL')
+list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
 
 def plot_by_neighbor(neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
