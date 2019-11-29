@@ -56,49 +56,44 @@ def plot_by_neighbor(neighbourhood="ALL", crime = "Theft of Bicycle", time_scale
 
 geojson_filepath = '../data/our_geojson.geojson'
 
-def open_geojson(path):
-    """
-    Opens a geojson file at "path" filepath
-    """
-    with open(path) as json_data:
-        d = json.load(json_data)
-    return d
-
 def get_geopandas_df(path):
     """
-    Creates geopandas dataframe from geeojson file 
-    at "path" filepath
+    Create a geopandas dataframe from the geeojson at the specified filepath
     """
-    open_json = open_geojson(path)
-    gdf = gpd.GeoDataFrame.from_features((open_json))
+    with open(path) as json_data:
+        open_json = json.load(json_data)
+    gdf = gpd.GeoDataFrame.from_features(open_json)
     return gdf
 
 gdf = get_geopandas_df(geojson_filepath)
 gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
 
-def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
+def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime_threshold = 1):
 
-    crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
-                .count().rename(columns = {'MINUTE': 'COUNT'})
-                .reset_index())
+    crime_cnt = (van_pd_less.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
+                 .count().rename(columns = {'MINUTE': 'COUNT'})
+                 .reset_index())
 
     if(crime_type.lower() == 'all'):
         crime_cnt = crime_cnt.groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
     else:
         crime_cnt = crime_cnt.query('TYPE == @crime_type').groupby('NEIGHBOURHOOD')[['COUNT']].sum().reset_index()
 
+    crime_cnt['MINMAX'] = (crime_cnt['COUNT'] - crime_cnt['COUNT'].min()) / (crime_cnt['COUNT'].max() - crime_cnt['COUNT'].min())
+    crime_cnt['MINMAX'] = round(crime_cnt['MINMAX'], 3)
     crime_geo_cnt = gdf.merge(crime_cnt, on = 'NEIGHBOURHOOD')
 
     alt_json = json.loads(crime_geo_cnt.to_json())
     alt_base = alt.Data(values = alt_json['features'])
 
     base_map = alt.Chart(alt_base, 
-                        title = f"Vancouver Crime Count (type = {crime_type})").mark_geoshape(
+                        title = f"Crime type = {crime_type}").mark_geoshape(
             stroke='white',
             strokeWidth=1
         ).encode(
             tooltip = [alt.Tooltip('properties.NEIGHBOURHOOD:N', title =  'Neighbourhood'), 
-                alt.Tooltip('properties.COUNT:Q', title = 'Count')]
+                       alt.Tooltip('properties.COUNT:Q', title = 'Count'), 
+                       alt.Tooltip('properties.MINMAX:Q', title =  'Ratio')]
         ).properties(
             width=1000,
             height=600
@@ -108,7 +103,12 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all'):
         fill = 'lightgray', 
         stroke = 'white'
     ).encode(
-        color = alt.Color('properties.COUNT:Q', legend = alt.Legend(title = 'crime count'))
+        alt.Color('properties.MINMAX:Q', 
+                  legend = alt.Legend(title = 'crime index'), 
+                  scale=alt.Scale(domain = (0.0, crime_threshold),
+                                  range = ('#CAFFA8', '#DF3F12', '#000000')
+                                 )
+                 )
     )
 
     return (choro + base_map).properties(width = 700, height = 400)
