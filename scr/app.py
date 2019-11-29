@@ -19,17 +19,10 @@ df = pd.read_csv('../data/crimedata_csv_all_years.csv')
 df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
-dict_of_locations = dict(zip(list_of_locations, list_of_locations))
+list_of_crimes = df['TYPE'].unique()
+list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
 
-list_of_crimes = df['TYPE'].dropna().unique()
-dict_of_crimes = dict(zip(list_of_crimes, list_of_crimes))
-
-list_of_years = ['YEAR', 'MONTH']
-
-def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "Theft of Bicycle", time_scale = "YEAR"):
-    
-    df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
-    
+def plot_by_neighbor(neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
     if neighbourhood != "ALL":
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
@@ -135,7 +128,8 @@ app.layout = html.Div([
             {'label': i, 'value': i}
             for i in list_of_crimes
         ],
-        value = 'Theft of Bicycle',
+        value = 'ALL',
+        placeholder = 'ALL',
         style=dict(width='90%',
             verticalAlign="middle"
             )
@@ -162,6 +156,7 @@ app.layout = html.Div([
             for i in list_of_locations
         ],
         value = 'ALL',
+        placeholder = 'ALL',
         style=dict(width='90%',
             verticalAlign="middle"
             )
@@ -194,7 +189,6 @@ app.layout = html.Div([
             width='100%',
             style={'border-width': '0'},
             
-            ### INSERT MAP CODE HERE FRANK, Don't forget ID for IFrame
                 srcDoc=plot_choropleth().to_html()
             ),
         
