@@ -189,6 +189,19 @@ app.layout = html.Div([
     
     html.Div([
         # Graphs
+        html.Div([
+            dcc.Slider(
+                id='slider-updatemode',
+        marks={'0.1': '0.1', '1': '1'},
+        max=1,
+        min=0.1,
+        value=1,
+        step=0.01,
+        updatemode='drag',
+        vertical=True
+            ),
+        ], style={'height': '100px', 'margin-left':'900px'}),
+        html.Br(),
         
         html.Iframe(
             # Crime Map
