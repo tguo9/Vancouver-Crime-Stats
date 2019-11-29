@@ -58,7 +58,6 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
     )
     return chart
 
-geojson_filepath = '../data/our_geojson.geojson'
 
 def get_geopandas_df(path):
     """
@@ -69,6 +68,7 @@ def get_geopandas_df(path):
     gdf = gpd.GeoDataFrame.from_features(open_json)
     return gdf
 
+geojson_filepath = '../data/our_geojson.geojson'
 gdf = get_geopandas_df(geojson_filepath)
 gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
 
