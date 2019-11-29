@@ -25,23 +25,15 @@ list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
 
-<<<<<<< HEAD
-def plot_by_neighbor(neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
-=======
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
     
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
->>>>>>> upstream/master
     if neighbourhood != "ALL":
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
         else:    
-<<<<<<< HEAD
-            df_line = df._line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
-=======
             df_line = df_line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
->>>>>>> upstream/master
     else:
         neighbourhood = 'All Neighbourhoods'
         if crime != "ALL":
