@@ -18,12 +18,16 @@ app.title = 'Vancouver Crime Stats'
 
 df = pd.read_csv('../data/crimedata_csv_all_years.csv')
 df = df.query('NEIGHBOURHOOD == NEIGHBOURHOOD & NEIGHBOURHOOD != "Musqueam" & NEIGHBOURHOOD != "Stanley Park"')
+df['DATE'] = pd.to_datetime({'year':df['YEAR'], 'month':df['MONTH'], 'day':df['DAY'], 'hour':df['HOUR']})
+df['DAY_OF_WEEK_NAME'] = pd.DatetimeIndex(df['DATE']).day_name()
+dofw = pd.DataFrame({'DAY_OF_WEEK_NAME': ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], 'DAY_OF_WEEK': [1,2,3,4,5,6,7]})
+df = pd.merge(df, dofw, how="left", on="DAY_OF_WEEK_NAME")
 
 list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
-list_of_years = ['YEAR', 'MONTH', 'DAY', 'HOUR']
+list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
     
