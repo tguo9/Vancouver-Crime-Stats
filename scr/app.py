@@ -50,11 +50,16 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         alt.X(time_scale+':N'),
         alt.Y('TYPE:Q', title='Number of Crimes'),
         alt.Color(value="blue")
-    ).configure_axisX(
-        labelAngle=90,
-        grid=True
     ).configure(
         background='#f7e0bc' #HEX color code
+    ).configure_axisX(
+        labelAngle=45,
+        grid=True
+    ).configure_axis(
+        labelFontSize=12,
+        titleFontSize=15
+    ).configure_title(
+        fontSize=15
     ).properties(
     height=300,
     width=500,
@@ -96,7 +101,7 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
     alt_base = alt.Data(values = alt_json['features'])
 
     base_map = alt.Chart(alt_base, 
-                        title = f"Crime type = {crime_type}").mark_geoshape(
+                        title = f"Crime Type = {crime_type}").mark_geoshape(
             stroke='white',
             strokeWidth=1
         ).encode(
@@ -113,124 +118,127 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
         stroke = 'white'
     ).encode(
         alt.Color('properties.MINMAX:Q', 
-                  legend = alt.Legend(title = 'crime index'), 
+                  legend = alt.Legend(title = 'Crime Index'), 
                   scale=alt.Scale(domain = (0.0, crime_threshold),
                                   range = ('#CAFFA8', '#DF3F12', '#000000')
                                  )
                  )
     )
 
-    return (choro + base_map).properties(width = 700, height = 400)
+    return (choro + base_map).configure_title(fontSize=15).properties(width = 700, height = 400)
 
 
 app.layout = html.Div([
 
+    # Header
     html.Div([
-        #Header
-        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left'}),
-        html.H1('Vancouver Crime Stats', style={'float':'left', 'margin-left':'10px'}),
-    ],style={'position':'absolute'}),
+        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left', 'margin-top': '5px', 'margin-left': '5px'}),
+        html.H1('Vancouver Crime Stats', style={'float':'left', 'margin-left':'15px'}),
+    ],style={'position':'absolute', 'width':'96%', 'height':'80px', 'backgroundColor':'#9ee6f6', 'border': '3px solid black'}),
     
+    # Crime Map
     html.Div([
-        # Drop Down Menus
-
-        html.H3('Crime Type'),
-        dcc.Dropdown(
-        id='crime-chart',
-        options=[
-            {'label': i, 'value': i}
-            for i in list_of_crimes
-        ],
-        value = 'ALL',
-        placeholder = 'ALL',
-        style=dict(width='90%',
-            verticalAlign="middle"
-            )
-        ),
-
-        html.H3('Years to Include'),
-        html.Div([
-            dcc.RangeSlider(
-                id='year-slider',
-                min=df['YEAR'].min(),
-                max=df['YEAR'].max(),
-                step=1,
-                marks={i:'{}'.format(i) for i in range(df['YEAR'].min(),df['YEAR'].max(),2)},
-                value=[df['YEAR'].min(), df['YEAR'].max()]
-            ),
-        ], style={'width': '90%', 'margin-left':'20px'}),
-        html.Br(),
-
-        html.H3('Neighbourhood'),
-        dcc.Dropdown(
-        id='dd-chart',
-        options=[
-            {'label': i, 'value': i}
-            for i in list_of_locations
-        ],
-        value = 'ALL',
-        placeholder = 'ALL',
-        style=dict(width='90%',
-            verticalAlign="middle"
-            )
-        ),
-
-        html.H3('Time Scale'),
-        dcc.Dropdown(
-        id='year-chart',
-        options=[
-            {'label': i, 'value': i}
-            for i in list_of_years
-        ],
-        value = 'YEAR',
-        style=dict(width='90%',
-            verticalAlign="middle"
-            )
-        ),
-
-
-    ], style={'float': 'left', 'width': '30%', 'height':'800px', 'margin-top': '100px', 'background-color':'#f7bb86'}),
-    
-    html.Div([
-        # Graphs
-        html.Div([
-            dcc.Slider(
-                id='slider-updatemode',
-        marks={'0.1': '0.1', '1': '1'},
-        max=1,
-        min=0.1,
-        value=1,
-        step=0.01,
-        updatemode='drag',
-        vertical=True
-            ),
-        ], style={'height': '100px', 'margin-left':'900px'}),
-        html.Br(),
         
-        html.Iframe(
-            # Crime Map
-            sandbox='allow-scripts',
-            id = 'choropleth',
-            height='400',
-            width='100%',
-            style={'border-width': '0'},
-            
+        html.Div([
+            html.H3('Crime Type'),
+            dcc.Dropdown(
+            id='crime-chart',
+            options=[
+                {'label': i, 'value': i}
+                for i in list_of_crimes
+            ],
+            value = 'ALL',
+            placeholder = 'ALL',
+            style=dict(width='80%',
+                verticalAlign="middle"
+                )
+            ),
+
+            html.H3('Years to Include'),
+            html.Div([
+                dcc.RangeSlider(
+                    id='year-slider',
+                    min=df['YEAR'].min(),
+                    max=df['YEAR'].max(),
+                    step=1,
+                    marks={i:'{}'.format(i) for i in range(df['YEAR'].min(),df['YEAR'].max()+1,2)},
+                    value=[df['YEAR'].min(), df['YEAR'].max()]
+                ),
+            ], style={'width': '60%', 'margin-left':'20px'}),
+
+        ], style={'height':'200px', 'margin-left':'20px'}),
+
+        html.Div([
+            html.Iframe(
+                sandbox='allow-scripts',
+                id = 'choropleth',
+                height='500',
+                width='80%',
+                style={'border-width': '0', 'float':'left'},
                 srcDoc=plot_choropleth().to_html()
             ),
+
+            html.Div([
+                html.H4('Crime Index Max'),
+                dcc.Slider(
+                    id='slider-updatemode',
+                    marks={'0.1': '0.1', '1': '1'},
+                    max=1,
+                    min=0.1,
+                    value=1,
+                    step=0.01,
+                    updatemode='drag',
+                    vertical=True
+                ),
+            ], style={'height': '200px', 'float':'left', 'margin-left': '30px', 'margin-top': '10px'}),
+        ])
+
+    ], style={'float': 'left', 'width': '60%', 'height':'800px', 'margin-top': '83px', 'background-color': '#e0e0eb', 'border': '3px solid black'}),
+    
+    # Crime Trends
+    html.Div([
+
+        html.Div([
+            html.H3('Neighbourhood'),
+            dcc.Dropdown(
+            id='dd-chart',
+            options=[
+                {'label': i, 'value': i}
+                for i in list_of_locations
+            ],
+            value = 'ALL',
+            placeholder = 'ALL',
+            style=dict(width='90%',
+                verticalAlign="middle"
+                )
+            ),
+
+            html.H3('Time Scale'),
+            dcc.Dropdown(
+            id='year-chart',
+            options=[
+                {'label': i, 'value': i}
+                for i in list_of_years
+            ],
+            value = 'YEAR',
+            style=dict(width='90%',
+                verticalAlign="middle"
+                )
+            ),
+
+        ], style={'height':'200px', 'margin-left':'20px'}),
         
         html.Iframe(
-            # Crime Trends
             sandbox='allow-scripts',
             id='plot',
-            height='400',
-            width='100%',
-            style={'border-width': '0'},
-
+            height='500',
+            width='95%',
+            style={'border-width': '0', 'margin-left':'20px'},
             srcDoc=plot_by_neighbor().to_html()
+        ),
         
-            ),
-    ], style={'float': 'right', 'width': '70%', 'margin-top': '100px'}),        
-], style={})
+    ], style={'float': 'left', 'width': '36.5%', 'height':'800px', 'margin-top': '83px', 'backgroundColor':'#e0e0eb', 'border': '3px solid black'}),        
+])
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
