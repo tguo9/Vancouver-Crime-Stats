@@ -16,10 +16,10 @@ In the line chart, we intend to show how the count of crimes in a neighbourhood 
 This ‘Vancouver Crime Stats’ app is an app combined with multiple dropdowns and two slider bars. Those controllers can let the user filter out different crime types and time ranges. The graph on the left allows users to zoom in to the neighbourhood and show the time statistics on different time scales.
 
 ## Documentation
-- Crime Type: is a drop down box that let use select the crime types happened  from 2003 to 2018. Default crime is all crime types combined together.
-- Years to Include: from 2003 to 2018. Select the year ranges. Default year range is from 2003 to 2018.
-- Neighbourhood: Neighbourhoods in Vancouver. Default is all neighbourhood
-- Time Scale: Default year and can select from year, month, day of the week and time.
-- The Crime Index: a threshold that change the color across all neighbourhoods in Vancouver. Default is 1.
+- Crime Type: A drop down box that let use select the crime types happened from 2003 to 2018. Default crime is all crime types combined together.
+- Years to Include: From 2003 to 2018. Select the year ranges. Default year range is from 2003 to 2018.
+- Neighbourhood: Neighbourhoods in Vancouver. Default is all neighbourhoods.
+- Time Scale: Select from year, month, day of the week and time. Default time scale is year.
+- The Crime Index: A threshold that change the colour across all neighbourhoods in Vancouver. Default threshold is 1.
 
 ![](img/App-Deployed.png)
