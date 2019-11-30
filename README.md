@@ -6,11 +6,17 @@
 Team members: Frank Lu, Derek Kruszewski, Tao Guo  
 
 ## Description of APP  
-This APP is intended to show the historical crime data in a geo-temporal form.  To achieve this, it will display a choropleth of City of Vancouver for showing neighbourhoods and a line chart for showing the relationship between crime count and time.   This APP will be interactive and allows its users to specify the neighbourhood, crime type, and time scale to gain more understanding of how crimes are correlated to the neighbourhoods and time.
+This APP shows Vancouver's historical crime data in geo-temporal form. It displays a choropleth of City of Vancouver for showing neighbourhood crime comparisons and a line chart for showing individual neighbourhood crime trends.
   
-On the choropleth, the number of crimes in different neighbourhoods is colour-coded so that users can easily relate the count of a crime type to its relative location in Vancouver.  A dropdown list will be added for choosing the crime type.  There will also be a slider bar for changing the year range of the crime data, in case some users might be interested in a more recent crime data.  
+On the choropleth (crime map), the number of crimes in different neighbourhoods is normalized and colour-coded so that users relate the count of a crime type to its relative location in Vancouver. A dropdown list is provided for choosing the crime type. There is also a slider bar for changing the year range of the crime data in case some users are interested in more recent crime data. A second slider bar is provided to change the color saturation of the choropeth to different maximum crime indexes. This allows the user to remove high crime neighbourhood outliers and still show color comparisons for lower crime neighbourhoods.
   
-In the line chart, we intend to show how the count of crimes in a neighbourhood varies with time.  So, there will be two dropdown lists accompanying the line chart: one for selecting the neighbourhood, and the other for selecting the time scale.  This way, the users can easily see the specified neighbourhood’s criminal trend in terms of the time, date, month or year.  
-  
+In the line chart (crime trend chart), the count of crimes in a neighbourhood is shown as varied over a time scale. One dropdown is provided for selecting the neighbourhood, and another for selecting the time scale.
 
-![](img/App-Sketch.jpg)
+## Functionalities
+- Crime Type: A drop down box that lets the user select the crime types occuring from 2003 to 2018. Default crime is all crime types combined together.
+- Years to Include: From 2003 to 2018. Select the year ranges. Default year range is from 2003 to 2018.
+- Neighbourhood: Neighbourhoods in Vancouver. Default is all neighbourhoods.
+- Time Scale: Select from year, month, day of the week or hour. Default time scale is year.
+- The Crime Index: A threshold that change the colour across all neighbourhoods in Vancouver. Default threshold is 1.
+
+![](img/App-Deployed.png)
