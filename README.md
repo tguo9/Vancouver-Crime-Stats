@@ -10,7 +10,17 @@ This APP is intended to show the historical crime data in a geo-temporal form.  
   
 On the choropleth, the number of crimes in different neighbourhoods is colour-coded so that users can easily relate the count of a crime type to its relative location in Vancouver.  A dropdown list will be added for choosing the crime type.  There will also be a slider bar for changing the year range of the crime data, in case some users might be interested in a more recent crime data.  
   
-In the line chart, we intend to show how the count of crimes in a neighbourhood varies with time.  So, there will be two dropdown lists accompanying the line chart: one for selecting the neighbourhood, and the other for selecting the time scale.  This way, the users can easily see the specified neighbourhood’s criminal trend in terms of the time, date, month or year.  
-  
+In the line chart, we intend to show how the count of crimes in a neighbourhood varies with time.  So, there will be two dropdown lists accompanying the line chart: one for selecting the neighbourhood, and the other for selecting the time scale.  This way, the users can easily see the specified neighbourhood’s criminal trend in terms of the time, date, month or year. 
+
+## Functionalities
+This ‘Vancouver Crime Stats’ app is an app combined with multiple dropdowns and two slider bars. Those controllers can let the user filter out different crime types and time ranges. The graph on the left allows users to zoom in to the neighbourhood and show the time statistics on different time scales.
+
+## Documentation
+- Crime Type: is a drop down box that let use select the crime types happened  from 2003 to 2018. Default crime is all crime types combined together.
+- Years to Include: from 2003 to 2018. Select the year ranges. Default year range is from 2003 to 2018.
+- Neighbourhood: Neighbourhoods in Vancouver. Default is all neighbourhood
+- Time Scale: Default year and can select from year, month, day of the week and time.
+- The Crime Index: a threshold that change the color across all neighbourhoods in Vancouver. Default is 1.
+
 
 ![](img/App-Sketch.jpg)
