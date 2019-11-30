@@ -22,5 +22,4 @@ This ‘Vancouver Crime Stats’ app is an app combined with multiple dropdowns 
 - Time Scale: Default year and can select from year, month, day of the week and time.
 - The Crime Index: a threshold that change the color across all neighbourhoods in Vancouver. Default is 1.
 
-
-![](img/App-Sketch.jpg)
+![](img/App-Deployed.png)
