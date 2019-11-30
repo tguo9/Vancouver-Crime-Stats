@@ -19,4 +19,10 @@ In the line chart (crime trend chart), the count of crimes in a neighbourhood is
 - Time Scale: Select from year, month, day of the week or hour. Default time scale is year.
 - The Crime Index: A threshold that change the colour across all neighbourhoods in Vancouver. Default threshold is 1.
 
+## APP Link
+
+https://dsci-532-group108-milestone2.herokuapp.com/
+
+## APP Screenshot
+
 ![](img/App-Deployed.png)
