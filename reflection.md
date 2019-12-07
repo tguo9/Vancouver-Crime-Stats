@@ -21,3 +21,21 @@
 - Updated teamwork contract to include general roles and responsibilities.
 - In dropdown, restricted user to select one neighbourhood for crime trend chart.
 - README.md file updated to highlight functionality of crime trend chart for various time scales.
+
+## Peer Feedback
+
+TO DO
+- Speed issues of choropeth crime index (Please wait to load)
+- Explain Crime Index (Add definition with explanation of crime index)
+- Time scale dropdown names not as crude
+- Add introduction to dashboard
+- Tooltip still shows ratio, whereas crime index on legend
+- Have two lines for multiple neighbourhoods in line chart
+
+NOT TO DO
+- Time scale for month/week/hour (explain this is total counts in year)
+- Size issues if people aren't using 100% in there browser
+- Highlight individual neighbourhood on choropeth once selected
+- Add rank to choropeth tool tip
+- Add tooltip to line chart
+

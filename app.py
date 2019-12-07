@@ -30,7 +30,27 @@ list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
-    
+    """
+    Create line chart plot of neighbourhood specific crime data
+
+    Parameters
+    ----------
+    year_init : int (default 2010)
+        start year of data set
+    year_end : int (default 2018)
+        ending year of data set
+    neighbourhood : str (default 'ALL')
+        neighbourhood to examine
+    crime : str (default 'ALL')
+        crime type to examine
+    time_scale : str (default 'YEAR')
+        time scale of line graph
+
+    Returns
+    -------
+    chart : altair.Chart object
+        altair line chart with filtered crime data
+    """
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
     if neighbourhood != "ALL":
@@ -82,7 +102,25 @@ gdf = get_geopandas_df(geojson_filepath)
 gdf = gdf.rename(columns = {'Name': 'NEIGHBOURHOOD'}).drop(columns = 'description')
 
 def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime_threshold = 1):
+    """
+    Create choropleth of crime data across neighbourhoods in Vancouver
 
+    Parameters
+    ----------
+    year_init : int (default 2010)
+        start year of data set
+    year_end : int (default 2018)
+        ending year of data set
+    crime_type : str (default 'ALL')
+        crime type to examine
+    crime_threshold : float
+        maximum value of choropleth color scale
+
+    Returns
+    -------
+    altair.Chart object
+        altair choropleth chart with filtered crime data
+    """
     crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
                  .count().rename(columns = {'MINUTE': 'COUNT'})
                  .reset_index())
