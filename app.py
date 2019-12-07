@@ -27,7 +27,7 @@ list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
-list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
+list_of_years = ['YEAR', 'MONTH', 'DAY OF WEEK', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", neighbourhood_2="ALL", crime = "ALL", time_scale = "YEAR"):
     """
@@ -56,6 +56,9 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", nei
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
     df_line_2 = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
+    if time_scale == 'DAY OF WEEK':
+        time_scale = 'DAY_OF_WEEK'
+
     if neighbourhood != "ALL":
         neighbourhood_n = neighbourhood
         if crime != "ALL":
@@ -148,8 +151,8 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
         altair choropleth chart with filtered crime data
     """
     crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
-                 .count().rename(columns = {'MINUTE': 'COUNT'})
-                 .reset_index())
+                .count().rename(columns = {'MINUTE': 'COUNT'})
+                .reset_index())
 
     if(crime_type.lower() == 'all'):
         crime_type = 'All Crimes'
@@ -170,8 +173,8 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
             strokeWidth=1
         ).encode(
             tooltip = [alt.Tooltip('properties.NEIGHBOURHOOD:N', title =  'Neighbourhood'), 
-                       alt.Tooltip('properties.COUNT:Q', title = 'Count'), 
-                       alt.Tooltip('properties.MINMAX:Q', title =  'Ratio')]
+                    alt.Tooltip('properties.COUNT:Q', title = 'Count'), 
+                    alt.Tooltip('properties.MINMAX:Q', title =  'Ratio')]
         ).properties(
             width=1000,
             height=600
@@ -182,11 +185,11 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
         stroke = 'white'
     ).encode(
         alt.Color('properties.MINMAX:Q', 
-                  legend = alt.Legend(title = 'Crime Index'), 
-                  scale=alt.Scale(domain = (0.0, crime_threshold),
-                                  range = ('#CAFFA8', '#DF3F12', '#000000')
-                                 )
-                 )
+                legend = alt.Legend(title = 'Crime Index'), 
+                scale=alt.Scale(domain = (0.0, crime_threshold),
+                                range = ('#CAFFA8', '#DF3F12', '#000000')
+                                )
+                )
     )
 
     return (choro + base_map).configure_title(fontSize=15).properties(width = 700, height = 400)
@@ -256,9 +259,16 @@ app.layout = html.Div([
                     vertical=True
                 ),
             ], style={'height': '200px', 'float':'left', 'margin-left': '30px', 'margin-top': '10px'}),
-        ])
+        ]),
+        
+        html.Div([
+            html.P('Crime Index shows how does the crime count of a neighborhood compare to other neighborhoods.'),
+            html.P('- If it equals 1, then this neighborhood has the highest crime count among all neighborhoods.'),
+            html.P('- If it equals 0, then this neighborhood has the lowest crime count among all neighborhoods'),
+            html.P('Adjusting \"Crime Index Max\" bar can saturate neighborhoods with high crime counts and reveal the smaller difference.  (This function is slow due to free heroku service.')
+        ], style={'width': '900px'})
 
-    ], style={'float': 'left', 'width': '60%', 'height':'800px', 'margin-top': '93px', 'background-color': '#e0e0eb', 'border': '3px solid black'}),
+    ], style={'float': 'left', 'width': '60%', 'height':'900px', 'margin-top': '83px', 'background-color': '#e0e0eb', 'border': '3px solid black'}),
     
     # Crime Trends
     html.Div([
@@ -316,7 +326,7 @@ app.layout = html.Div([
             srcDoc=plot_by_neighbor().to_html()
         ),
         
-    ], style={'float': 'left', 'width': '36.5%', 'height':'800px', 'margin-top': '93px', 'backgroundColor':'#e0e0eb', 'border': '3px solid black'}),        
+    ], style={'float': 'left', 'width': '36.5%', 'height':'900px', 'margin-top': '83px', 'backgroundColor':'#e0e0eb', 'border': '3px solid black'}),        
 ])
 
 @app.callback(
@@ -331,14 +341,14 @@ def update_plot(year_range, location, location2, types, year):
 @app.callback(
     dash.dependencies.Output('choropleth', 'srcDoc'),
     [dash.dependencies.Input('year-slider', 'value'), 
-     dash.dependencies.Input('crime-chart', 'value'), 
-     dash.dependencies.Input('slider-updatemode', 'value')])
+    dash.dependencies.Input('crime-chart', 'value'), 
+    dash.dependencies.Input('slider-updatemode', 'value')])
 def update_choropleth(year_range, crime_type, crime_threshold):
 
     updated_plot = plot_choropleth(year_init=year_range[0], 
-                                   year_end=year_range[1], 
-                                   crime_type=crime_type, 
-                                   crime_threshold=crime_threshold).to_html()
+                                    year_end=year_range[1], 
+                                    crime_type=crime_type, 
+                                    crime_threshold=crime_threshold).to_html()
 
     return updated_plot
 
