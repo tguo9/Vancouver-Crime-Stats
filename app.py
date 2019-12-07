@@ -27,7 +27,7 @@ list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
-list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
+list_of_years = ['YEAR', 'MONTH', 'DAY OF WEEK', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
     """
@@ -53,6 +53,9 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
     """
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
+    if time_scale == 'DAY OF WEEK':
+        time_scale = 'DAY_OF_WEEK'
+
     if neighbourhood != "ALL":
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
@@ -65,7 +68,7 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         else:
             crime = 'All Crimes'
             df_line = df_line.groupby([time_scale]).count().reset_index() 
-    
+
     chart = alt.Chart(df_line).mark_line().encode(
         alt.X(time_scale+':N'),
         alt.Y('TYPE:Q', title='Number of Crimes'),
@@ -122,8 +125,8 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
         altair choropleth chart with filtered crime data
     """
     crime_cnt = (df.query('@year_init <= YEAR & YEAR <= @year_end').groupby(['NEIGHBOURHOOD', 'TYPE'])[['MINUTE']]
-                 .count().rename(columns = {'MINUTE': 'COUNT'})
-                 .reset_index())
+                .count().rename(columns = {'MINUTE': 'COUNT'})
+                .reset_index())
 
     if(crime_type.lower() == 'all'):
         crime_type = 'All Crimes'
@@ -144,8 +147,8 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
             strokeWidth=1
         ).encode(
             tooltip = [alt.Tooltip('properties.NEIGHBOURHOOD:N', title =  'Neighbourhood'), 
-                       alt.Tooltip('properties.COUNT:Q', title = 'Count'), 
-                       alt.Tooltip('properties.MINMAX:Q', title =  'Ratio')]
+                    alt.Tooltip('properties.COUNT:Q', title = 'Count'), 
+                    alt.Tooltip('properties.MINMAX:Q', title =  'Ratio')]
         ).properties(
             width=1000,
             height=600
@@ -156,11 +159,11 @@ def plot_choropleth(year_init = 2010, year_end = 2018, crime_type = 'all', crime
         stroke = 'white'
     ).encode(
         alt.Color('properties.MINMAX:Q', 
-                  legend = alt.Legend(title = 'Crime Index'), 
-                  scale=alt.Scale(domain = (0.0, crime_threshold),
-                                  range = ('#CAFFA8', '#DF3F12', '#000000')
-                                 )
-                 )
+                legend = alt.Legend(title = 'Crime Index'), 
+                scale=alt.Scale(domain = (0.0, crime_threshold),
+                                range = ('#CAFFA8', '#DF3F12', '#000000')
+                                )
+                )
     )
 
     return (choro + base_map).configure_title(fontSize=15).properties(width = 700, height = 400)
@@ -291,14 +294,14 @@ def update_plot(year_range, location, types, year):
 @app.callback(
     dash.dependencies.Output('choropleth', 'srcDoc'),
     [dash.dependencies.Input('year-slider', 'value'), 
-     dash.dependencies.Input('crime-chart', 'value'), 
-     dash.dependencies.Input('slider-updatemode', 'value')])
+    dash.dependencies.Input('crime-chart', 'value'), 
+    dash.dependencies.Input('slider-updatemode', 'value')])
 def update_choropleth(year_range, crime_type, crime_threshold):
 
     updated_plot = plot_choropleth(year_init=year_range[0], 
-                                   year_end=year_range[1], 
-                                   crime_type=crime_type, 
-                                   crime_threshold=crime_threshold).to_html()
+                                    year_end=year_range[1], 
+                                    crime_type=crime_type, 
+                                    crime_threshold=crime_threshold).to_html()
 
     return updated_plot
 
