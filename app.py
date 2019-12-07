@@ -170,9 +170,10 @@ app.layout = html.Div([
 
     # Header
     html.Div([
-        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left', 'margin-top': '5px', 'margin-left': '5px'}),
+        html.Img(src='https://img.icons8.com/wired/64/000000/policeman-male.png', style={'float':'left', 'margin-top': '10px', 'margin-left': '8px'}),
         html.H1('Vancouver Crime Stats', style={'float':'left', 'margin-left':'15px'}),
-    ],style={'position':'absolute', 'width':'96%', 'height':'80px', 'backgroundColor':'#9ee6f6', 'border': '3px solid black'}),
+        html.Div(["Open source crime data from the City of Vancouver shown for neighbourhood comparison"], style={'position':'absolute', 'float':'left', 'margin-top': '60px', 'margin-left':'90px'})
+    ],style={'position':'absolute', 'width':'96%', 'height':'90px', 'backgroundColor':'#9ee6f6', 'border': '3px solid black'}),
     
     # Crime Map
     html.Div([
@@ -231,7 +232,7 @@ app.layout = html.Div([
             ], style={'height': '200px', 'float':'left', 'margin-left': '30px', 'margin-top': '10px'}),
         ])
 
-    ], style={'float': 'left', 'width': '60%', 'height':'800px', 'margin-top': '83px', 'background-color': '#e0e0eb', 'border': '3px solid black'}),
+    ], style={'float': 'left', 'width': '60%', 'height':'800px', 'margin-top': '93px', 'background-color': '#e0e0eb', 'border': '3px solid black'}),
     
     # Crime Trends
     html.Div([
@@ -275,7 +276,7 @@ app.layout = html.Div([
             srcDoc=plot_by_neighbor().to_html()
         ),
         
-    ], style={'float': 'left', 'width': '36.5%', 'height':'800px', 'margin-top': '83px', 'backgroundColor':'#e0e0eb', 'border': '3px solid black'}),        
+    ], style={'float': 'left', 'width': '36.5%', 'height':'800px', 'margin-top': '93px', 'backgroundColor':'#e0e0eb', 'border': '3px solid black'}),        
 ])
 
 @app.callback(
