@@ -29,7 +29,7 @@ list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
 list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
 
-def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
+def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", neighbourhood_2="ALL", crime = "ALL", time_scale = "YEAR"):
     """
     Create line chart plot of neighbourhood specific crime data
 
@@ -40,7 +40,9 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
     year_end : int (default 2018)
         ending year of data set
     neighbourhood : str (default 'ALL')
-        neighbourhood to examine
+        1st neighbourhood to examine
+    neighbourhood_2 : str (default 'ALL')
+        2nd neighbourhood to examine
     crime : str (default 'ALL')
         crime type to examine
     time_scale : str (default 'YEAR')
@@ -52,25 +54,51 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         altair line chart with filtered crime data
     """
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
+    df_line_2 = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
     if neighbourhood != "ALL":
+        neighbourhood_n = neighbourhood
         if crime != "ALL":
+            crime_n = crime
             df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
         else:    
+            crime_n = 'All Crimes'
             df_line = df_line.query('NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
     else:
-        neighbourhood = 'All Neighbourhoods'
+        neighbourhood_n = 'All Neighbourhoods'
         if crime != "ALL":
+            crime_n = crime
             df_line = df_line.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
         else:
-            crime = 'All Crimes'
-            df_line = df_line.groupby([time_scale]).count().reset_index() 
+            crime_n = 'All Crimes'
+            df_line = df_line.groupby([time_scale]).count().reset_index()
+
+    if neighbourhood_2 != "ALL":
+        neighbourhood_2_n = neighbourhood_2
+        if crime != "ALL":
+            df_line_2 = df_line_2.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood_2').groupby([time_scale]).count().reset_index()
+        else:    
+            df_line_2 = df_line_2.query('NEIGHBOURHOOD == @neighbourhood_2').groupby([time_scale]).count().reset_index()
+    else:
+        neighbourhood_2_n = 'All Neighbourhoods'
+        if crime != "ALL":
+            df_line_2 = df_line_2.query('TYPE == @crime').groupby([time_scale]).count().reset_index()
+        else:
+            df_line_2 = df_line_2.groupby([time_scale]).count().reset_index() 
     
     chart = alt.Chart(df_line).mark_line().encode(
         alt.X(time_scale+':N'),
         alt.Y('TYPE:Q', title='Number of Crimes'),
-        alt.Color(value="blue")
-    ).configure(
+        alt.Color(value='blue')
+    )
+    
+    chart_2 = alt.Chart(df_line_2).mark_line().encode(
+        alt.X(time_scale+':N'),
+        alt.Y('TYPE:Q', title='Number of Crimes'),
+        alt.Color(value='red')
+    )
+    
+    return (chart + chart_2).encode().configure(
         background='#f7e0bc' #HEX color code
     ).configure_axisX(
         labelAngle=45,
@@ -83,10 +111,8 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
     ).properties(
     height=300,
     width=500,
-    title= neighbourhood + ': ' + crime
+    title= neighbourhood_n + ' vs ' + neighbourhood_2_n + ': ' + crime_n
     )
-    return chart
-
 
 def get_geopandas_df(path):
     """
@@ -238,9 +264,23 @@ app.layout = html.Div([
     html.Div([
 
         html.Div([
-            html.H3('Neighbourhood'),
+            html.H3('Neighbourhood 1', style={'color':'blue'}),
             dcc.Dropdown(
             id='dd-chart',
+            options=[
+                {'label': i, 'value': i}
+                for i in list_of_locations
+            ],
+            value = 'ALL',
+            placeholder = 'ALL',
+            style=dict(width='90%',
+                verticalAlign="middle"
+                )
+            ),
+
+            html.H3('Neighbourhood 2', style={'color':'red'}),
+            dcc.Dropdown(
+            id='dd-chart-2',
             options=[
                 {'label': i, 'value': i}
                 for i in list_of_locations
@@ -265,7 +305,7 @@ app.layout = html.Div([
                 )
             ),
 
-        ], style={'height':'200px', 'margin-left':'20px'}),
+        ], style={'height':'300px', 'margin-left':'20px'}),
         
         html.Iframe(
             sandbox='allow-scripts',
@@ -281,10 +321,10 @@ app.layout = html.Div([
 
 @app.callback(
     dash.dependencies.Output('plot', 'srcDoc'),
-    [dash.dependencies.Input('year-slider', 'value'), dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
-def update_plot(year_range, location, types, year):
+    [dash.dependencies.Input('year-slider', 'value'), dash.dependencies.Input('dd-chart', 'value'), dash.dependencies.Input('dd-chart-2', 'value'), dash.dependencies.Input('crime-chart', 'value'), dash.dependencies.Input('year-chart', 'value')])
+def update_plot(year_range, location, location2, types, year):
 
-    updated_plot = plot_by_neighbor(year_init=year_range[0], year_end=year_range[1], neighbourhood=location, crime=types, time_scale=year).to_html()
+    updated_plot = plot_by_neighbor(year_init=year_range[0], year_end=year_range[1], neighbourhood=location, neighbourhood_2=location2, crime=types, time_scale=year).to_html()
 
     return updated_plot
 
