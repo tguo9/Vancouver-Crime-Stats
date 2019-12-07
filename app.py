@@ -27,7 +27,7 @@ list_of_locations = df['NEIGHBOURHOOD'].dropna().unique()
 list_of_locations = np.insert(list_of_locations, 0, 'ALL')
 list_of_crimes = df['TYPE'].unique()
 list_of_crimes = np.insert(list_of_crimes, 0, 'ALL')
-list_of_years = ['YEAR', 'MONTH', 'DAY_OF_WEEK', 'HOUR']
+list_of_years = ['YEAR', 'MONTH', 'DAY OF WEEK', 'HOUR']
 
 def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", crime = "ALL", time_scale = "YEAR"):
     """
@@ -53,6 +53,9 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
     """
     df_line = df.query('@year_init <= YEAR & YEAR <= @year_end')
     
+    if time_scale == 'DAY OF WEEK':
+        time_scale = 'DAY_OF_WEEK'
+
     if neighbourhood != "ALL":
         if crime != "ALL":
             df_line = df_line.query('TYPE == @crime & NEIGHBOURHOOD == @neighbourhood').groupby([time_scale]).count().reset_index()
