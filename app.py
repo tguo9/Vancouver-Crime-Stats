@@ -68,7 +68,7 @@ def plot_by_neighbor(year_init = 2010, year_end = 2018, neighbourhood="ALL", cri
         else:
             crime = 'All Crimes'
             df_line = df_line.groupby([time_scale]).count().reset_index() 
-    
+
     chart = alt.Chart(df_line).mark_line().encode(
         alt.X(time_scale+':N'),
         alt.Y('TYPE:Q', title='Number of Crimes'),
